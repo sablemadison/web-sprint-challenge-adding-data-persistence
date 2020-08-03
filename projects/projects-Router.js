@@ -29,49 +29,23 @@ router.post('/', (req, res) => {
         .catch((err)=> { console.log(err)})
     })
 
+    //Read Tasks
 
-//Resource
- //Create
+router.get('/:id/task', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const tasks = await db('task')
+         .join('project', 'project.id', 'task.project_id')
+         .select('task.id','task.notes','task.completed', 'task.project_id','project.project_name', 'project.description' )
+         .where({project_id: id});
+        res.status(200).json(tasks)
+    } catch(err) {
+        console.log(err),
+        res.status(500).json({error:'could not return tasks'})
+    }
+})
 
-router.post('/', (req, res) => {
-    const resourceData = req.body;
-        db('resource')
-        .insert(resourceData)
-        .then((id)=> res.status(201).json({data: id}))
-        .catch((err)=> console.log(err))
-    
-    })
-    
-    //Read
-    
-    router.get('/', (req, res) => {
-        db.select('*')
-        .from('resource')
-        .then((resources)=> res.status(200).json({data: resources}))
-        .catch((err)=> { console.log(err)})
-        })
 
-//Task
- //Create
 
- router.post('/', (req, res) => {
-    const taskData = req.body;
-        db('task')
-        .insert(taskData)
-        .then((id)=> res.status(201).json({data: id}))
-        .catch((err)=> console.log(err))
-    
-    })
-    
-    //Read
-    
-    router.get('/', async  (req, res) => {
-       
-    const tasks = await db('task as t')
-     .join('project as p', 'p.id', 't.project_id')
-     .select('t.id’,’t.description','t.notes','t.completed', 't.project_id','p.name', 'p.description' )
-     .where({project_id: id})
-        })
-    
 
         module.exports = router;
